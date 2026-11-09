@@ -1,4 +1,4 @@
-Import os
+import os
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -14,11 +14,19 @@ async def on_ready():
     print(f"Logged in as {bot.user} (ID: {bot.user.id})")
     try:
         synced = await bot.tree.sync()
-        print(f"Synced {len(synced)} command(s)")
+        print(f"Synced {len(synced)} command(s) successfully!")
     except Exception as e:
         print(f"Error syncing commands: {e}")
 
-@app_commands.command(name="ส่งของ", description="ส่งใบยืนยันคำสั่งซื้อสินค้า")
+@bot.tree.command(name="ส่งของ", description="ส่งใบยืนยันคำสั่งซื้อสินค้า")
+@app_commands.describe(
+    user="ลูกค้าที่สั่งซื้อสินค้า",
+    item="ชื่อรายการสินค้า",
+    baht="ยอดเงินรวม (เช่น 380.-)",
+    amount="จำนวนสินค้า (ค่าเริ่มต้นคือ 1)",
+    channel="ห้องที่ต้องการส่งใบยืนยัน (ไม่เลือกจะส่งห้องนี้)",
+    image="แนบรูปภาพสินค้า/หลักฐาน"
+)
 async def send_order(
     interaction: discord.Interaction,
     user: discord.Member,
@@ -64,4 +72,8 @@ async def send_order(
         ephemeral=True
     )
 
-bot.run(os.getenv("DISCORD_TOKEN"))
+token = os.getenv("DISCORD_TOKEN")
+if not token:
+    raise ValueError("ไม่พบตัวแปร DISCORD_TOKEN กรุณาตั้งค่าในหน้า Variables ก่อนรัน")
+
+bot.run(token)
